@@ -1,0 +1,940 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Serie A 2026-27 Tracker</title>
+<style>
+  :root {
+    --bg: #f6f1e7; --card: #ffffff; --text: #1a1a1a; --muted: #6b6b6b; --border: #e2ddd0;
+    --cl: #d6f5d6; --cl-text: #1a6b1a; --el: #d6e8ff; --el-text: #1a4a8a;
+    --ecl: #e0d6ff; --ecl-text: #4a1a8a; --rel: #ffd6d6; --rel-text: #8a1a1a;
+    --accent: #0b1c4d; --tab-bg: #eee6d6; --tab-active: #0b1c4d; --tab-active-text: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #16131a; --card: #211d29; --text: #f0ede4; --muted: #a39d8f; --border: #3a3444;
+      --cl: #143d14; --cl-text: #8fe08f; --el: #143355; --el-text: #9cc4f5;
+      --ecl: #2e1a55; --ecl-text: #c9b3f5;
+      --rel: #551a1a; --rel-text: #f5a3a3;
+      --accent: #7f9cff; --tab-bg: #2a2534; --tab-active: #7f9cff; --tab-active-text: #16131a;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #16131a; --card: #211d29; --text: #f0ede4; --muted: #a39d8f; --border: #3a3444;
+    --cl: #143d14; --cl-text: #8fe08f; --el: #143355; --el-text: #9cc4f5;
+    --ecl: #2e1a55; --ecl-text: #c9b3f5;
+    --rel: #551a1a; --rel-text: #f5a3a3;
+    --accent: #7f9cff; --tab-bg: #2a2534; --tab-active: #7f9cff; --tab-active-text: #16131a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 24px 16px 60px; }
+  .wrap { max-width: 940px; margin: 0 auto; }
+  h1 { font-size: 1.6rem; margin-bottom: 4px; color: var(--accent); }
+  .updated { color: var(--muted); font-size: 0.85rem; margin-bottom: 18px; }
+  .tabs { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+  .tab-btn {
+    background: var(--tab-bg); color: var(--text); border: none; border-radius: 8px;
+    padding: 10px 16px; font-size: 0.9rem; font-weight: 600; cursor: pointer;
+  }
+  .tab-btn.active { background: var(--tab-active); color: var(--tab-active-text); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 20px; overflow-x: auto; }
+  h2 { font-size: 1.1rem; margin-top: 0; }
+  .intro { font-size: 0.88rem; color: var(--muted); margin-bottom: 16px; line-height: 1.5; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.85rem; white-space: nowrap; }
+  th, td { padding: 6px 8px; text-align: center; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; }
+  td.team, th.team { text-align: left; }
+  .crest { width: 16px; height: 16px; vertical-align: middle; margin-right: 6px; }
+  .pos { font-weight: 700; } .pts { font-weight: 700; }
+  tr.cl { background: var(--cl); color: var(--cl-text); }
+  tr.el { background: var(--el); color: var(--el-text); }
+  tr.ecl { background: var(--ecl); color: var(--ecl-text); }
+  tr.rel { background: var(--rel); color: var(--rel-text); }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 0.78rem; margin-top: 10px; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+  .dot.cl { background: var(--cl); } .dot.el { background: var(--el); }
+  .dot.ecl { background: var(--ecl); } .dot.rel { background: var(--rel); }
+  .note { color: var(--muted); font-size: 0.8rem; margin-top: 8px; }
+  .explainer { background: var(--tab-bg); border-radius: 8px; padding: 10px 14px; font-size: 0.82rem; color: var(--text); margin-bottom: 12px; line-height: 1.5; }
+  .explainer b { color: var(--accent); }
+  footer { text-align: center; color: var(--muted); font-size: 0.75rem; margin-top: 30px; }
+  details.stat-accordion { border: 1px solid var(--border); border-radius: 10px; margin-bottom: 12px; overflow: hidden; }
+  details.stat-accordion summary {
+    cursor: pointer; padding: 14px 16px; font-weight: 700; font-size: 0.98rem;
+    list-style: none; display: flex; justify-content: space-between; align-items: center;
+    background: var(--card);
+  }
+  details.stat-accordion summary::-webkit-details-marker { display: none; }
+  details.stat-accordion summary::after { content: "+"; font-size: 1.2rem; color: var(--muted); }
+  details.stat-accordion[open] summary::after { content: "−"; }
+  details.stat-accordion summary .sub { font-weight: 400; font-size: 0.78rem; color: var(--muted); margin-top: 2px; display: block; }
+  details.stat-accordion .accordion-body { padding: 0 16px 16px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Serie A 2026-27 Tracker</h1>
+  <div class="updated">Matchday 1 · Last updated August 23, 2026 13:23 UTC</div>
+  
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('table')">League Table</button>
+    <button class="tab-btn" onclick="showTab('club')">Club Stats</button>
+    <button class="tab-btn" onclick="showTab('player')">Player Stats</button>
+  </div>
+
+  <div id="tab-table" class="tab-panel active">
+    <div class="card">
+      <h2>League Table</h2>
+      <table>
+        <thead><tr><th>#</th><th class="team">Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th><th>Form</th></tr></thead>
+        <tbody>
+    <tr class="cl">
+      <td class="pos">1</td>
+      <td class="team"><img src="https://crests.football-data.org/108.png" alt="" class="crest"> Inter</td>
+      <td>1</td><td>1</td><td>0</td><td>0</td>
+      <td>4</td><td>1</td><td>+3</td>
+      <td class="pts">3</td><td class="form">—</td>
+    </tr>
+    <tr class="cl">
+      <td class="pos">2</td>
+      <td class="team"><img src="https://crests.football-data.org/113.png" alt="" class="crest"> Napoli</td>
+      <td>1</td><td>1</td><td>0</td><td>0</td>
+      <td>2</td><td>0</td><td>+2</td>
+      <td class="pts">3</td><td class="form">—</td>
+    </tr>
+    <tr class="cl">
+      <td class="pos">3</td>
+      <td class="team"><img src="https://crests.football-data.org/104.png" alt="" class="crest"> Cagliari</td>
+      <td>1</td><td>1</td><td>0</td><td>0</td>
+      <td>1</td><td>0</td><td>+1</td>
+      <td class="pts">3</td><td class="form">—</td>
+    </tr>
+    <tr class="cl">
+      <td class="pos">4</td>
+      <td class="team"><img src="https://crests.football-data.org/7397.png" alt="" class="crest"> Como 1907</td>
+      <td>1</td><td>0</td><td>1</td><td>0</td>
+      <td>1</td><td>1</td><td>0</td>
+      <td class="pts">1</td><td class="form">—</td>
+    </tr>
+    <tr class="el">
+      <td class="pos">5</td>
+      <td class="team"><img src="https://crests.football-data.org/115.png" alt="" class="crest"> Udinese</td>
+      <td>1</td><td>0</td><td>1</td><td>0</td>
+      <td>1</td><td>1</td><td>0</td>
+      <td class="pts">1</td><td class="form">—</td>
+    </tr>
+    <tr class="ecl">
+      <td class="pos">6</td>
+      <td class="team"><img src="https://crests.football-data.org/98.png" alt="" class="crest"> Milan</td>
+      <td>0</td><td>0</td><td>0</td><td>0</td>
+      <td>0</td><td>0</td><td>0</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="">
+      <td class="pos">7</td>
+      <td class="team"><img src="https://crests.football-data.org/99.png" alt="" class="crest"> Fiorentina</td>
+      <td>0</td><td>0</td><td>0</td><td>0</td>
+      <td>0</td><td>0</td><td>0</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="">
+      <td class="pos">8</td>
+      <td class="team"><img src="https://crests.football-data.org/100.png" alt="" class="crest"> Roma</td>
+      <td>0</td><td>0</td><td>0</td><td>0</td>
+      <td>0</td><td>0</td><td>0</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="">
+      <td class="pos">9</td>
+      <td class="team"><img src="https://crests.football-data.org/102.png" alt="" class="crest"> Atalanta</td>
+      <td>0</td><td>0</td><td>0</td><td>0</td>
+      <td>0</td><td>0</td><td>0</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="">
+      <td class="pos">10</td>
+      <td class="team"><img src="https://crests.football-data.org/103.png" alt="" class="crest"> Bologna</td>
+      <td>0</td><td>0</td><td>0</td><td>0</td>
+      <td>0</td><td>0</td><td>0</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="">
+      <td class="pos">11</td>
+      <td class="team"><img src="https://crests.football-data.org/470.png" alt="" class="crest"> Frosinone</td>
+      <td>0</td><td>0</td><td>0</td><td>0</td>
+      <td>0</td><td>0</td><td>0</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="">
+      <td class="pos">12</td>
+      <td class="team"><img src="https://crests.football-data.org/109.png" alt="" class="crest"> Juventus</td>
+      <td>0</td><td>0</td><td>0</td><td>0</td>
+      <td>0</td><td>0</td><td>0</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="">
+      <td class="pos">13</td>
+      <td class="team"><img src="https://crests.football-data.org/110.png" alt="" class="crest"> Lazio</td>
+      <td>0</td><td>0</td><td>0</td><td>0</td>
+      <td>0</td><td>0</td><td>0</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="">
+      <td class="pos">14</td>
+      <td class="team"><img src="https://crests.football-data.org/471.png" alt="" class="crest"> Sassuolo</td>
+      <td>0</td><td>0</td><td>0</td><td>0</td>
+      <td>0</td><td>0</td><td>0</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="">
+      <td class="pos">15</td>
+      <td class="team"><img src="https://crests.football-data.org/586.png" alt="" class="crest"> Torino</td>
+      <td>0</td><td>0</td><td>0</td><td>0</td>
+      <td>0</td><td>0</td><td>0</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="">
+      <td class="pos">16</td>
+      <td class="team"><img src="https://crests.football-data.org/5890.png" alt="" class="crest"> Lecce</td>
+      <td>0</td><td>0</td><td>0</td><td>0</td>
+      <td>0</td><td>0</td><td>0</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="">
+      <td class="pos">17</td>
+      <td class="team"><img src="https://crests.football-data.org/454.png" alt="" class="crest"> Venezia FC</td>
+      <td>0</td><td>0</td><td>0</td><td>0</td>
+      <td>0</td><td>0</td><td>0</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="rel">
+      <td class="pos">18</td>
+      <td class="team"><img src="https://crests.football-data.org/112.png" alt="" class="crest"> Parma</td>
+      <td>1</td><td>0</td><td>0</td><td>1</td>
+      <td>0</td><td>1</td><td>-1</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="rel">
+      <td class="pos">19</td>
+      <td class="team"><img src="https://crests.football-data.org/107.png" alt="" class="crest"> Genoa</td>
+      <td>1</td><td>0</td><td>0</td><td>1</td>
+      <td>0</td><td>2</td><td>-2</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="rel">
+      <td class="pos">20</td>
+      <td class="team"><img src="https://crests.football-data.org/5911.png" alt="" class="crest"> Monza</td>
+      <td>1</td><td>0</td><td>0</td><td>1</td>
+      <td>1</td><td>4</td><td>-3</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr></tbody>
+      </table>
+      <div class="note"><b>P</b> Played &nbsp;·&nbsp; <b>W</b> Won &nbsp;·&nbsp; <b>D</b> Drawn &nbsp;·&nbsp; <b>L</b> Lost &nbsp;·&nbsp; <b>GF</b> Goals For &nbsp;·&nbsp; <b>GA</b> Goals Against &nbsp;·&nbsp; <b>GD</b> Goal Difference (GF minus GA — the first tiebreaker when teams are level on points) &nbsp;·&nbsp; <b>Pts</b> Points (3 for a win, 1 for a draw, 0 for a loss) &nbsp;·&nbsp; <b>Form</b> results of the last 5 games, oldest to newest</div>
+      <div class="legend">
+        <span><span class="dot cl"></span>Champions League (1-4)</span>
+        <span><span class="dot el"></span>Europa League (5)</span>
+        <span><span class="dot ecl"></span>Conference League (6)</span>
+        <span><span class="dot rel"></span>Relegation (18-20)</span>
+      </div>
+      <div class="explainer"><b>New to Serie A?</b> Unlike the Bundesliga, there's no relegation play-off here — the bottom 3 (18th-20th) go straight down to Serie B, no second chance. The Coppa Italia winner can bump the Conference League berth to whichever league position misses out on Europe otherwise, so the exact 6th-place picture can shift late in the season.</div>
+    </div>
+
+    <div class="card">
+      <h2>European Race</h2>
+      <table>
+        <thead><tr><th>#</th><th class="team">Team</th><th>Zone</th><th>Pts</th><th>Games Left</th><th>Gap to 4th</th></tr></thead>
+        <tbody>
+    <tr class="cl">
+      <td class="pos">1</td>
+      <td class="team"><img src="https://crests.football-data.org/108.png" alt="" class="crest"> Inter</td>
+      <td>Champions League</td><td>3</td><td>37</td>
+      <td>—</td>
+    </tr>
+    <tr class="cl">
+      <td class="pos">2</td>
+      <td class="team"><img src="https://crests.football-data.org/113.png" alt="" class="crest"> Napoli</td>
+      <td>Champions League</td><td>3</td><td>37</td>
+      <td>—</td>
+    </tr>
+    <tr class="cl">
+      <td class="pos">3</td>
+      <td class="team"><img src="https://crests.football-data.org/104.png" alt="" class="crest"> Cagliari</td>
+      <td>Champions League</td><td>3</td><td>37</td>
+      <td>—</td>
+    </tr>
+    <tr class="cl">
+      <td class="pos">4</td>
+      <td class="team"><img src="https://crests.football-data.org/7397.png" alt="" class="crest"> Como 1907</td>
+      <td>Champions League</td><td>1</td><td>37</td>
+      <td>—</td>
+    </tr>
+    <tr class="el">
+      <td class="pos">5</td>
+      <td class="team"><img src="https://crests.football-data.org/115.png" alt="" class="crest"> Udinese</td>
+      <td>Europa League</td><td>1</td><td>37</td>
+      <td>Level with 4th</td>
+    </tr>
+    <tr class="ecl">
+      <td class="pos">6</td>
+      <td class="team"><img src="https://crests.football-data.org/98.png" alt="" class="crest"> Milan</td>
+      <td>Conference League</td><td>0</td><td>38</td>
+      <td>1 pt behind 4th</td>
+    </tr>
+    <tr class="">
+      <td class="pos">7</td>
+      <td class="team"><img src="https://crests.football-data.org/99.png" alt="" class="crest"> Fiorentina</td>
+      <td>Chasing pack</td><td>0</td><td>38</td>
+      <td>1 pt behind 4th</td>
+    </tr>
+    <tr class="">
+      <td class="pos">8</td>
+      <td class="team"><img src="https://crests.football-data.org/100.png" alt="" class="crest"> Roma</td>
+      <td>Chasing pack</td><td>0</td><td>38</td>
+      <td>1 pt behind 4th</td>
+    </tr></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>Relegation Watch</h2>
+      <table>
+        <thead><tr><th>#</th><th class="team">Team</th><th>Pts</th><th>Games Left</th><th>What it takes to stay up</th></tr></thead>
+        <tbody>
+    <tr class="">
+      <td class="pos">15</td>
+      <td class="team"><img src="https://crests.football-data.org/586.png" alt="" class="crest"> Torino</td>
+      <td>0</td><td>38</td><td>Needs 40 pts from 38 games (1.05 pts/game — above league-average pace)</td>
+    </tr>
+    <tr class="">
+      <td class="pos">16</td>
+      <td class="team"><img src="https://crests.football-data.org/5890.png" alt="" class="crest"> Lecce</td>
+      <td>0</td><td>38</td><td>Needs 40 pts from 38 games (1.05 pts/game — above league-average pace)</td>
+    </tr>
+    <tr class="">
+      <td class="pos">17</td>
+      <td class="team"><img src="https://crests.football-data.org/454.png" alt="" class="crest"> Venezia FC</td>
+      <td>0</td><td>38</td><td>Needs 40 pts from 38 games (1.05 pts/game — above league-average pace)</td>
+    </tr>
+    <tr class="rel">
+      <td class="pos">18</td>
+      <td class="team"><img src="https://crests.football-data.org/112.png" alt="" class="crest"> Parma</td>
+      <td>0</td><td>37</td><td>Needs 40 pts from 37 games (1.08 pts/game — above league-average pace)</td>
+    </tr>
+    <tr class="rel">
+      <td class="pos">19</td>
+      <td class="team"><img src="https://crests.football-data.org/107.png" alt="" class="crest"> Genoa</td>
+      <td>0</td><td>37</td><td>Needs 40 pts from 37 games (1.08 pts/game — above league-average pace)</td>
+    </tr>
+    <tr class="rel">
+      <td class="pos">20</td>
+      <td class="team"><img src="https://crests.football-data.org/5911.png" alt="" class="crest"> Monza</td>
+      <td>0</td><td>37</td><td>Needs 40 pts from 37 games (1.08 pts/game — above league-average pace)</td>
+    </tr></tbody>
+      </table>
+      <div class="note">"Safety" modeled as ~40 points, a rough historical Serie A survival benchmark over a 38-game season.</div>
+    </div>
+  </div>
+
+  <div id="tab-club" class="tab-panel">
+    <div class="explainer">
+      <b>New to Serie A?</b> The table tells you <i>where</i> a team stands, but not <i>how</i> they got there. These stats show the underlying strengths and weaknesses — Serie A has historically been the most defense-minded of Europe's top leagues, so clean-sheet numbers matter more here than almost anywhere else.
+    </div>
+
+    <div class="card">
+      <h2>Defensive Strength: Clean Sheets</h2>
+      <div class="explainer">A <b>clean sheet</b> is a game where a team doesn't concede at all. It's the single clearest sign of defensive solidity — Serie A title winners are almost always among the league's clean-sheet leaders, in a league famous for its defensive tradition (<i>catenaccio</i>).</div>
+      <table>
+        <thead><tr><th class="team">Team</th><th>Played</th><th>Clean Sheets</th><th>Goals Conceded / Game</th><th>Failed to Score</th></tr></thead>
+        <tbody>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/113.png" alt="" class="crest"> Napoli</td>
+      <td>1</td><td>1</td>
+      <td>0.00</td><td>0</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/104.png" alt="" class="crest"> Cagliari</td>
+      <td>1</td><td>1</td>
+      <td>0.00</td><td>0</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/115.png" alt="" class="crest"> Udinese</td>
+      <td>1</td><td>0</td>
+      <td>1.00</td><td>0</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/7397.png" alt="" class="crest"> Como 1907</td>
+      <td>1</td><td>0</td>
+      <td>1.00</td><td>0</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/108.png" alt="" class="crest"> Inter</td>
+      <td>1</td><td>0</td>
+      <td>1.00</td><td>0</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/112.png" alt="" class="crest"> Parma</td>
+      <td>1</td><td>0</td>
+      <td>1.00</td><td>1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/107.png" alt="" class="crest"> Genoa</td>
+      <td>1</td><td>0</td>
+      <td>2.00</td><td>1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/5911.png" alt="" class="crest"> Monza</td>
+      <td>1</td><td>0</td>
+      <td>4.00</td><td>0</td>
+    </tr></tbody>
+      </table>
+      <div class="note"><b>Failed to Score</b> counts games where a team didn't score at all — a blunt but telling sign of attacking struggles.</div>
+    </div>
+
+    <div class="card">
+      <h2>Home Fortress vs. Road Warriors</h2>
+      <div class="explainer">Some teams are much stronger at home than away (or the reverse). <b>Points per game (PPG)</b> at home vs. away shows exactly how lopsided that split is. <b>Form</b> is the last 5 results (most recent last) — a better read on momentum than the season-long record.</div>
+      <table>
+        <thead><tr><th class="team">Team</th><th>Form (last 5)</th><th>Home Record</th><th>Away Record</th></tr></thead>
+        <tbody>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/108.png" alt="" class="crest"> Inter</td>
+      <td>W</td>
+      <td>3pts / 1g (3.00/g)</td>
+      <td>0pts / 0g (0.00/g)</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/113.png" alt="" class="crest"> Napoli</td>
+      <td>W</td>
+      <td>0pts / 0g (0.00/g)</td>
+      <td>3pts / 1g (3.00/g)</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/104.png" alt="" class="crest"> Cagliari</td>
+      <td>W</td>
+      <td>0pts / 0g (0.00/g)</td>
+      <td>3pts / 1g (3.00/g)</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/115.png" alt="" class="crest"> Udinese</td>
+      <td>D</td>
+      <td>1pts / 1g (1.00/g)</td>
+      <td>0pts / 0g (0.00/g)</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/7397.png" alt="" class="crest"> Como 1907</td>
+      <td>D</td>
+      <td>0pts / 0g (0.00/g)</td>
+      <td>1pts / 1g (1.00/g)</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/5911.png" alt="" class="crest"> Monza</td>
+      <td>L</td>
+      <td>0pts / 0g (0.00/g)</td>
+      <td>0pts / 1g (0.00/g)</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/107.png" alt="" class="crest"> Genoa</td>
+      <td>L</td>
+      <td>0pts / 1g (0.00/g)</td>
+      <td>0pts / 0g (0.00/g)</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/112.png" alt="" class="crest"> Parma</td>
+      <td>L</td>
+      <td>0pts / 1g (0.00/g)</td>
+      <td>0pts / 0g (0.00/g)</td>
+    </tr></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>Biggest Wins &amp; Heaviest Losses</h2>
+      <div class="explainer">Goal margin matters beyond the 3 points — a big win boosts goal difference (which breaks ties in the table) and can be a statement result against a rival, especially in a Derby d'Italia (Juventus vs. Inter) or Derby della Madonnina (Inter vs. Milan).</div>
+      <div style="display:flex; gap:16px; flex-wrap:wrap;">
+        <table style="flex:1; min-width:220px;">
+          <thead><tr><th class="team">Team</th><th>Biggest Win</th></tr></thead>
+          <tbody><tr><td>Inter</td><td>4-1 vs Monza</td></tr><tr><td>Napoli</td><td>2-0 vs Genoa</td></tr><tr><td>Cagliari</td><td>1-0 vs Parma</td></tr></tbody>
+        </table>
+        <table style="flex:1; min-width:220px;">
+          <thead><tr><th class="team">Team</th><th>Heaviest Loss</th></tr></thead>
+          <tbody><tr><td>Monza</td><td>1-4 vs Inter</td></tr><tr><td>Genoa</td><td>0-2 vs Napoli</td></tr><tr><td>Parma</td><td>0-1 vs Cagliari</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="note" style="margin-top: -8px;">Not shown: possession, shots, passing accuracy, tackles, or expected goals (xG) — these require a paid data source. Everything above is derived directly from final match scores.</div>
+  </div>
+
+  <div id="tab-player" class="tab-panel">
+    <div class="explainer">
+      <b>New to Serie A?</b> The <i>Capocannoniere</i> (top scorer) race is one of Italian football's oldest storylines. Goals alone don't capture everything a player contributes — this table adds context.
+    </div>
+    
+    <div class="card">
+      <h2>Top Scorer Race &amp; Goal Involvements</h2>
+      <div class="explainer">
+        <b>Goals</b>: the headline number, and what decides the Capocannoniere title.<br>
+        <b>Assists</b>: the pass that directly leads to a goal — a measure of creativity, not just finishing.<br>
+        <b>Goal Involvements</b> (goals + assists): a fuller picture of a player's attacking output.<br>
+        <b>Goals/Game</b>: raw totals favor players who've played more games — this rate stat levels the comparison.<br>
+        <b>Penalties</b>: shown separately since penalty goals are viewed differently from open-play goals.
+      </div>
+      <table><thead><tr><th class="team">Player</th><th>Club</th><th>Games</th><th>Goals</th><th>Assists</th><th>Goal Inv.</th><th>Pens</th><th>Goals/Game</th></tr></thead><tbody>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/108.png" alt="" class="crest"> Francesco Esposito</td>
+      <td>Inter</td>
+      <td>1</td>
+      <td class="pts">1</td>
+      <td class="">1</td>
+      <td class="">2</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/113.png" alt="" class="crest"> Kevin De Bruyne</td>
+      <td>Napoli</td>
+      <td>1</td>
+      <td class="pts">1</td>
+      <td class="">1</td>
+      <td class="">2</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/115.png" alt="" class="crest"> Hassane Kamara</td>
+      <td>Udinese</td>
+      <td>1</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/7397.png" alt="" class="crest"> Anastasios Douvikas</td>
+      <td>Como 1907</td>
+      <td>1</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/108.png" alt="" class="crest"> Hakan Çalhanoğlu</td>
+      <td>Inter</td>
+      <td>1</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/5911.png" alt="" class="crest"> Gustavo Varela</td>
+      <td>Monza</td>
+      <td>1</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/108.png" alt="" class="crest"> Piotr Zieliński</td>
+      <td>Inter</td>
+      <td>1</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/108.png" alt="" class="crest"> Yann Aurel Bisseck</td>
+      <td>Inter</td>
+      <td>1</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/113.png" alt="" class="crest"> Antonio Vergara</td>
+      <td>Napoli</td>
+      <td>1</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/104.png" alt="" class="crest"> Alessandro Romano</td>
+      <td>Cagliari</td>
+      <td>1</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr></tbody></table>
+      
+      <div class="note">Not shown: shots, expected goals (xG), key passes, dribbles, or tackles — this combined table's data source only tracks goals, assists, penalties, and appearances. Deeper stats (like xG) require a paid provider.</div>
+    </div>
+
+    <div class="explainer" style="margin-top: 4px;">
+      <b>Want just one ranking at a time?</b> The sections below pull real numbers directly from legaseriea.it's own official stats hub — Goals, Assists, Yellow Cards, and Red Cards.
+    </div>
+
+    <details class="stat-accordion">
+      <summary>Most Goals <span class="sub">The Capocannoniere race — decided by goals alone, nothing else</span></summary>
+      <div class="accordion-body">
+        <div class="explainer"><b>Goals</b> is the headline number and what the top scorer title is decided by.</div>
+        <table><thead><tr><th class="team">Player</th><th>Club</th><th>Goals</th></tr></thead><tbody>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/f791dab8f0e4449e9884dd8dbd42dbcc.webp" alt="" class="crest">Kevin De Bruyne</td>
+          <td>Napoli</td>
+          <td class="pts">1</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/f791dab8f0e4449e9884dd8dbd42dbcc.webp" alt="" class="crest">Antonio Vergara</td>
+          <td>Napoli</td>
+          <td class="pts">1</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/b7421caff23448c49134fa4f9095ee09.webp" alt="" class="crest">Hakan Çalhanoglu</td>
+          <td>Inter</td>
+          <td class="pts">1</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/9ba470f39580450fac7654956ba574fa.webp" alt="" class="crest">Gustavo Varela</td>
+          <td>Monza</td>
+          <td class="pts">1</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/b7421caff23448c49134fa4f9095ee09.webp" alt="" class="crest">Piotr Zieliński</td>
+          <td>Inter</td>
+          <td class="pts">1</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/b7421caff23448c49134fa4f9095ee09.webp" alt="" class="crest">Yann Bisseck</td>
+          <td>Inter</td>
+          <td class="pts">1</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/b7421caff23448c49134fa4f9095ee09.webp" alt="" class="crest">Francesco Pio Esposito</td>
+          <td>Inter</td>
+          <td class="pts">1</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/367e70bf50b346209f8a0f16429850cb.webp" alt="" class="crest">Tasos Douvikas</td>
+          <td>Como</td>
+          <td class="pts">1</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/630b1e3631db42498d1b7bc94595c5e0.webp" alt="" class="crest">Hassane Kamara</td>
+          <td>Udinese</td>
+          <td class="pts">1</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/25aecd0eda3e4453aabd9a9d5e7fba0d.webp" alt="" class="crest">Alessandro Romano</td>
+          <td>Cagliari</td>
+          <td class="pts">1</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/630b1e3631db42498d1b7bc94595c5e0.webp" alt="" class="crest">Oier Zarraga</td>
+          <td>Udinese</td>
+          <td class="pts">0</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/367e70bf50b346209f8a0f16429850cb.webp" alt="" class="crest">Maxence Caqueret</td>
+          <td>Como</td>
+          <td class="pts">0</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/9ba470f39580450fac7654956ba574fa.webp" alt="" class="crest">Filippo Delli Carri</td>
+          <td>Monza</td>
+          <td class="pts">0</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/367e70bf50b346209f8a0f16429850cb.webp" alt="" class="crest">Ivan Smolčić</td>
+          <td>Como</td>
+          <td class="pts">0</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/8c7aa94d22f44738951748e2ccdf319a.webp" alt="" class="crest">Adam Žulevič</td>
+          <td>Genoa</td>
+          <td class="pts">0</td>
+        </tr></tbody></table>
+      </div>
+    </details>
+
+    <details class="stat-accordion">
+      <summary>Most Assists <span class="sub">Who's creating goals for others, not just scoring them</span></summary>
+      <div class="accordion-body">
+        <div class="explainer"><b>Assists</b> credit the pass (or occasionally the touch) that directly leads to a goal — the clearest single measure of creativity.</div>
+        <table><thead><tr><th class="team">Player</th><th>Club</th><th>Assists</th></tr></thead><tbody>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/b7421caff23448c49134fa4f9095ee09.webp" alt="" class="crest">Andy Diouf</td>
+          <td>Inter</td>
+          <td class="pts">2</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/f791dab8f0e4449e9884dd8dbd42dbcc.webp" alt="" class="crest">Kevin De Bruyne</td>
+          <td>Napoli</td>
+          <td class="pts">1</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/f791dab8f0e4449e9884dd8dbd42dbcc.webp" alt="" class="crest">Antonio Vergara</td>
+          <td>Napoli</td>
+          <td class="pts">1</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/9ba470f39580450fac7654956ba574fa.webp" alt="" class="crest">Mathis Mout</td>
+          <td>Monza</td>
+          <td class="pts">1</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/630b1e3631db42498d1b7bc94595c5e0.webp" alt="" class="crest">Jurgen Ekkelenkamp</td>
+          <td>Udinese</td>
+          <td class="pts">1</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/b7421caff23448c49134fa4f9095ee09.webp" alt="" class="crest">Francesco Pio Esposito</td>
+          <td>Inter</td>
+          <td class="pts">1</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/25aecd0eda3e4453aabd9a9d5e7fba0d.webp" alt="" class="crest">Michel Adopo</td>
+          <td>Cagliari</td>
+          <td class="pts">1</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/630b1e3631db42498d1b7bc94595c5e0.webp" alt="" class="crest">Oier Zarraga</td>
+          <td>Udinese</td>
+          <td class="pts">0</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/367e70bf50b346209f8a0f16429850cb.webp" alt="" class="crest">Maxence Caqueret</td>
+          <td>Como</td>
+          <td class="pts">0</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/9ba470f39580450fac7654956ba574fa.webp" alt="" class="crest">Filippo Delli Carri</td>
+          <td>Monza</td>
+          <td class="pts">0</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/367e70bf50b346209f8a0f16429850cb.webp" alt="" class="crest">Ivan Smolčić</td>
+          <td>Como</td>
+          <td class="pts">0</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/8c7aa94d22f44738951748e2ccdf319a.webp" alt="" class="crest">Adam Žulevič</td>
+          <td>Genoa</td>
+          <td class="pts">0</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/25aecd0eda3e4453aabd9a9d5e7fba0d.webp" alt="" class="crest">Giuseppe Aurelio</td>
+          <td>Cagliari</td>
+          <td class="pts">0</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/25aecd0eda3e4453aabd9a9d5e7fba0d.webp" alt="" class="crest">Kingstone Mutandwa</td>
+          <td>Cagliari</td>
+          <td class="pts">0</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/3294993c79b14d918ccdc78da0fb90c5.webp" alt="" class="crest">Benjamin Cremaschi</td>
+          <td>Parma</td>
+          <td class="pts">0</td>
+        </tr></tbody></table>
+      </div>
+    </details>
+
+    <details class="stat-accordion">
+      <summary>Most Yellow Cards <span class="sub">Discipline — persistent fouling, five in a season triggers an automatic ban</span></summary>
+      <div class="accordion-body">
+        <div class="explainer">A <b>yellow card</b> is a caution for a foul or unsporting behavior. Two in one match means a red card and an early shower. Accumulate enough yellows across the season and the player serves an automatic one-match ban.</div>
+        <table><thead><tr><th class="team">Player</th><th>Club</th><th>Yellow Cards</th></tr></thead><tbody>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/630b1e3631db42498d1b7bc94595c5e0.webp" alt="" class="crest">Unai Gómez</td>
+          <td>Udinese</td>
+          <td class="pts">1</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/b7421caff23448c49134fa4f9095ee09.webp" alt="" class="crest">Hakan Çalhanoglu</td>
+          <td>Inter</td>
+          <td class="pts">1</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/b7421caff23448c49134fa4f9095ee09.webp" alt="" class="crest">Lautaro Martínez</td>
+          <td>Inter</td>
+          <td class="pts">1</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/f791dab8f0e4449e9884dd8dbd42dbcc.webp" alt="" class="crest">Matteo Politano</td>
+          <td>Napoli</td>
+          <td class="pts">1</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/25aecd0eda3e4453aabd9a9d5e7fba0d.webp" alt="" class="crest">Zé Pedro</td>
+          <td>Cagliari</td>
+          <td class="pts">1</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/25aecd0eda3e4453aabd9a9d5e7fba0d.webp" alt="" class="crest">Jacopo Fazzini</td>
+          <td>Cagliari</td>
+          <td class="pts">1</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/630b1e3631db42498d1b7bc94595c5e0.webp" alt="" class="crest">Jakub Piotrowski</td>
+          <td>Udinese</td>
+          <td class="pts">1</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/9ba470f39580450fac7654956ba574fa.webp" alt="" class="crest">Lorenzo Lucchesi</td>
+          <td>Monza</td>
+          <td class="pts">1</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/9ba470f39580450fac7654956ba574fa.webp" alt="" class="crest">Eddy Kouadio</td>
+          <td>Monza</td>
+          <td class="pts">1</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/630b1e3631db42498d1b7bc94595c5e0.webp" alt="" class="crest">James Abankwah</td>
+          <td>Udinese</td>
+          <td class="pts">1</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/630b1e3631db42498d1b7bc94595c5e0.webp" alt="" class="crest">Oier Zarraga</td>
+          <td>Udinese</td>
+          <td class="pts">0</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/367e70bf50b346209f8a0f16429850cb.webp" alt="" class="crest">Maxence Caqueret</td>
+          <td>Como</td>
+          <td class="pts">0</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/9ba470f39580450fac7654956ba574fa.webp" alt="" class="crest">Filippo Delli Carri</td>
+          <td>Monza</td>
+          <td class="pts">0</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/367e70bf50b346209f8a0f16429850cb.webp" alt="" class="crest">Ivan Smolčić</td>
+          <td>Como</td>
+          <td class="pts">0</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/8c7aa94d22f44738951748e2ccdf319a.webp" alt="" class="crest">Adam Žulevič</td>
+          <td>Genoa</td>
+          <td class="pts">0</td>
+        </tr></tbody></table>
+      </div>
+    </details>
+
+    <details class="stat-accordion">
+      <summary>Most Red Cards <span class="sub">Straight dismissals — an early shower and at least a one-match ban</span></summary>
+      <div class="accordion-body">
+        <div class="explainer">A <b>red card</b> means immediate ejection from the match, and the team plays the rest of the game a player short. Rare — usually the result of a serious foul, second yellow, or denying an obvious goalscoring opportunity.</div>
+        <table><thead><tr><th class="team">Player</th><th>Club</th><th>Red Cards</th></tr></thead><tbody>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/630b1e3631db42498d1b7bc94595c5e0.webp" alt="" class="crest">Oier Zarraga</td>
+          <td>Udinese</td>
+          <td class="pts">0</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/367e70bf50b346209f8a0f16429850cb.webp" alt="" class="crest">Maxence Caqueret</td>
+          <td>Como</td>
+          <td class="pts">0</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/9ba470f39580450fac7654956ba574fa.webp" alt="" class="crest">Filippo Delli Carri</td>
+          <td>Monza</td>
+          <td class="pts">0</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/367e70bf50b346209f8a0f16429850cb.webp" alt="" class="crest">Ivan Smolčić</td>
+          <td>Como</td>
+          <td class="pts">0</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/8c7aa94d22f44738951748e2ccdf319a.webp" alt="" class="crest">Adam Žulevič</td>
+          <td>Genoa</td>
+          <td class="pts">0</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/25aecd0eda3e4453aabd9a9d5e7fba0d.webp" alt="" class="crest">Giuseppe Aurelio</td>
+          <td>Cagliari</td>
+          <td class="pts">0</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/25aecd0eda3e4453aabd9a9d5e7fba0d.webp" alt="" class="crest">Kingstone Mutandwa</td>
+          <td>Cagliari</td>
+          <td class="pts">0</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/3294993c79b14d918ccdc78da0fb90c5.webp" alt="" class="crest">Benjamin Cremaschi</td>
+          <td>Parma</td>
+          <td class="pts">0</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/630b1e3631db42498d1b7bc94595c5e0.webp" alt="" class="crest">Unai Gómez</td>
+          <td>Udinese</td>
+          <td class="pts">0</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/3294993c79b14d918ccdc78da0fb90c5.webp" alt="" class="crest">Nesta Elphege</td>
+          <td>Parma</td>
+          <td class="pts">0</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/9ba470f39580450fac7654956ba574fa.webp" alt="" class="crest">Jay Robinson</td>
+          <td>Monza</td>
+          <td class="pts">0</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/b7421caff23448c49134fa4f9095ee09.webp" alt="" class="crest">Aleksandar Stanković</td>
+          <td>Inter</td>
+          <td class="pts">0</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/f791dab8f0e4449e9884dd8dbd42dbcc.webp" alt="" class="crest">Mathías Olivera</td>
+          <td>Napoli</td>
+          <td class="pts">0</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/f791dab8f0e4449e9884dd8dbd42dbcc.webp" alt="" class="crest">Lorenzo Lucca</td>
+          <td>Napoli</td>
+          <td class="pts">0</td>
+        </tr>
+        <tr>
+          <td class="team"><img src="https://media-sdp.legaseriea.it/clubLogos/b7421caff23448c49134fa4f9095ee09.webp" alt="" class="crest">John Stones</td>
+          <td>Inter</td>
+          <td class="pts">0</td>
+        </tr></tbody></table>
+      </div>
+    </details>
+  </div>
+
+  <footer>Data: football-data.org &amp; legaseriea.it · Rebuilt periodically, not live-updating</footer>
+</div>
+<script>
+function showTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
